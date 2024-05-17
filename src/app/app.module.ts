@@ -1,18 +1,33 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AuthModule } from './auth/auth.module';
+import { HttpClientModule } from '@angular/common/http';
+import { provideStore, StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { authFeatureKey, authReducer } from './auth/store/reducers';
+// import { authReducer } from './auth/store/reducers';
+// import { RegisterComponent } from './auth/components/register/register.component';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    AuthModule,
+    HttpClientModule,
+    StoreModule.forRoot({}, {}),
+    StoreModule.forFeature(authFeatureKey, authReducer),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+      trace: true,
+      traceLimit: 75,
+    }),
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
