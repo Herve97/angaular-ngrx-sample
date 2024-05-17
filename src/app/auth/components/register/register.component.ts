@@ -2,8 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { register } from '../../store/action';
+import { authActions } from '../../store/action';
 import { RegisterRequestInterface } from '../../types/registerRequest.interface';
+import {
+  selectIsSubmitting,
+  selectValidationErrors,
+} from '../../store/reducers';
+import { AuthStateInterface } from '../../types/authState.interface';
+import { AuthService } from '../../services/auth.service';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -13,14 +20,21 @@ import { RegisterRequestInterface } from '../../types/registerRequest.interface'
 export class RegisterComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
-    private store: Store
+    private store: Store<{ auth: AuthStateInterface }>,
+    private authService: AuthService
   ) {}
 
   form = this.fb.nonNullable.group({
     username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
+  });
+
+  isSubmitting$ = this.store.select(selectIsSubmitting);
+  backendErrors$ = this.store.select(selectValidationErrors);
+  data$ = combineLatest({
+    isSubmitting: this.store.select(selectIsSubmitting),
+    backendErrors: this.store.select(selectValidationErrors),
   });
 
   ngOnInit(): void {}
@@ -32,6 +46,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
     const request: RegisterRequestInterface = {
       user: this.form.getRawValue(),
     };
-    this.store.dispatch(register({ request }));
+    this.store.dispatch(authActions.register({ request }));
+    // this.authService.register(request).subscribe(
+    //   (response) => {
+    //     console.log('response: ', response);
+    //   },
+    //   (err) => {
+    //     console.log('error: ', err);
+    //   }
+    // );
   }
 }

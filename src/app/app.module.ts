@@ -8,6 +8,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { provideStore, StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { authFeatureKey, authReducer } from './auth/store/reducers';
+import { EffectsModule } from '@ngrx/effects';
+import * as authEffects from './auth/store/effects';
+// import { registerEffect } from './auth/store/effects';
 // import { authReducer } from './auth/store/reducers';
 // import { RegisterComponent } from './auth/components/register/register.component';
 
@@ -26,6 +29,7 @@ import { authFeatureKey, authReducer } from './auth/store/reducers';
       trace: true,
       traceLimit: 75,
     }),
+    EffectsModule.forRoot([authEffects]),
   ],
   providers: [],
   bootstrap: [AppComponent],
